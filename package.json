@@ -1,0 +1,22 @@
+{
+  "name": "electronjs-game-client",
+  "version": "1.0.0",
+  "description": "Gaem client launcher",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron ."
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jihadkhawaja/electronjs-Game-Client.git"
+  },
+  "author": "jihadkhawaja",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/jihadkhawaja/electronjs-Game-Client/issues"
+  },
+  "homepage": "https://github.com/jihadkhawaja/electronjs-Game-Client#readme",
+  "devDependencies": {
+    "electron": "^8.1.1"
+  }
+}
