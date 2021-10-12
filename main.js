@@ -13,7 +13,7 @@ const path = require('path');
 const gotTheLock = app.requestSingleInstanceLock()
 process.env['ELECTRON_DISABLE_SECURITY_WARNINGS'] = true;
 
-//const globalShortcut = electron.globalShortcut
+const globalShortcut = electron.globalShortcut
 let Tray = electron.Tray
 const iconPath = path.join(__dirname, 'icon.png')
 let tray = null;
@@ -43,7 +43,7 @@ function createWindow() {
     transparent: true,
     alwaysOnTop: true,
     show: false,
-    icon: path.join(__dirname, 'icon.png')
+    icon: iconPath
   });
   splashScreen.loadFile('splashScreen.html');
   loginMenu = new BrowserWindow({
@@ -57,18 +57,18 @@ function createWindow() {
     center: true,
     show: false,
     fullscreenable: true,
-    icon: path.join(__dirname, 'icon.png')
+    icon: iconPath
   });
-  loginMenu.loadURL('https://zerofornothing.com')
+  loginMenu.loadURL('http://localhost')
 
-  //loginMenu.webContents.session.clearStorageData()
+  loginMenu.webContents.session.clearStorageData()
 
   loginMenu.webContents.openDevTools();
   loginMenu.removeMenu()
-  // globalShortcut.register('f5', function() {
-  //   console.log('f5 is pressed')
-  //   loginMenu.reload()
-  // })
+  globalShortcut.register('f5', function() {
+    console.log('f5 is pressed')
+    loginMenu.reload()
+  })
   // globalShortcut.register('CommandOrControl+R', function() {
   //   console.log('CommandOrControl+R is pressed')
   //   loginMenu.reload()
@@ -88,9 +88,6 @@ function createWindow() {
     loginMenu = null
   })
 }
-// This method will be called when Electron has finished
-// initialization and is ready to create browser windows.
-// Some APIs can only be used after this event occurs.
 
 if (!gotTheLock) {
   app.quit()
@@ -128,6 +125,3 @@ app.on('activate', () => {
     createWindow()
   }
 })
-
-// In this file you can include the rest of your app's specific main process
-// code. You can also put them in separate files and require them here.
