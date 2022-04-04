@@ -3,9 +3,10 @@ const {
   app,
   BrowserWindow,
   Menu,
-  MenuItem
+  MenuItem,
+  shell
 } = require('electron')
-
+const Positioner = require('electron-positioner')
 let {
   ipcMain
 } = electron;
@@ -18,12 +19,14 @@ let Tray = electron.Tray
 const iconPath = path.join(__dirname, 'icon.png')
 let tray = null;
 
-let loginMenu = null;
 let splashScreen = null;
+let mainWindow = null;
 
 var child = require('child_process').execFile;
 var executablePath = path.join(__dirname, "Zero for Nothing Game Build/Zero for Nothing.exe")
 
+let defaultWidth = 1280;
+let defaultHeight = 720;
 
 function createWindow() {
   // child(executablePath, function(err, data) {
@@ -46,9 +49,9 @@ function createWindow() {
     icon: iconPath
   });
   splashScreen.loadFile('splashScreen.html');
-  loginMenu = new BrowserWindow({
-    width: 1280,
-    height: 720,
+  mainWindow = new BrowserWindow({
+    width: defaultWidth,
+    height: defaultHeight,
     webPreferences: {
       nodeIntegration: true
     },
@@ -59,33 +62,52 @@ function createWindow() {
     fullscreenable: true,
     icon: iconPath
   });
-  loginMenu.loadURL('http://localhost')
+  mainWindow.loadURL('http://localhost')
 
-  loginMenu.webContents.session.clearStorageData()
+  mainWindow.webContents.session.clearStorageData()
 
-  loginMenu.webContents.openDevTools();
-  loginMenu.removeMenu()
+  //mainWindow.webContents.openDevTools();
+  mainWindow.removeMenu()
   globalShortcut.register('f5', function() {
     console.log('f5 is pressed')
-    loginMenu.reload()
+    mainWindow.reload()
   })
+  let positioner = new Positioner(mainWindow);
+  globalShortcut.register('shift+tab', function() {
+    console.log('shift+tab is pressed');
+    shell.beep();
+    //positioner.move('center');
+    if(!mainWindow.isFullScreen()){
+      mainWindow.setFullScreen(true);
+      mainWindow.setResizable(false);
+      mainWindow.setAlwaysOnTop(true, 'screen');
+      mainWindow.show();
+    }else{
+      mainWindow.setFullScreen(false);
+      mainWindow.setResizable(true);
+      mainWindow.setAlwaysOnTop(false, 'screen');
+      mainWindow.setSize(defaultWidth,defaultHeight);
+      mainWindow.center();
+      mainWindow.show();
+    }
+  });
   // globalShortcut.register('CommandOrControl+R', function() {
   //   console.log('CommandOrControl+R is pressed')
-  //   loginMenu.reload()
+  //   mainWindow.reload()
   // })
   splashScreen.once('ready-to-show', () => {
     splashScreen.show();
     setTimeout(function() {
       if (splashScreen != null)
         splashScreen.destroy();
-      loginMenu.show();
+        mainWindow.show();
     }, 3000);
   });
   splashScreen.on('closed', () => {
     splashScreen = null
   })
-  loginMenu.on('closed', () => {
-    loginMenu = null
+  mainWindow.on('closed', () => {
+    mainWindow = null
   })
 }
 
@@ -94,9 +116,9 @@ if (!gotTheLock) {
 } else {
   app.on('second-instance', (event, commandLine, workingDirectory) => {
     // Someone tried to run a second instance, we should focus our window.
-    if (loginMenu) {
-      if (loginMenu.isMinimized()) loginMenu.restore()
-      loginMenu.focus()
+    if (mainWindow) {
+      if (mainWindow.isMinimized()) mainWindow.restore()
+      mainWindow.focus()
     } else if (splashScreen) {
       if (splashScreen.isMinimized()) splashScreen.restore()
       splashScreen.focus()
